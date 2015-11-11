@@ -13,6 +13,15 @@
 
 /* ---- Eigene Konstanten */
 
+/**
+ * PHYSIK!
+ */
+#define PARTICLE_COUNT	6000000
+#define RAND_COUNT		(PARTICLE_COUNT*100)
+#define ATTRACTOR_COUNT	8
+
+
+
 #define GROUND_HEIGHT	0.3
 
 #define CAMERA_X        -50.1
@@ -30,7 +39,7 @@
 #define EPS		0.0001
 
 /** Anzahl der Aufrufe der Timer-Funktion pro Sekunde */
-#define TIMER_CALLS_PS      120
+#define TIMER_CALLS_PS      1920
 
 #define RED                     0.7, 0.0, 0.0
 #define BLUE                    0.0, 0.0, 0.7
@@ -65,5 +74,17 @@ typedef Vector4D Punkt4D;
 typedef GLfloat CGVector3D[3];
 
 typedef int Movement[3];
+
+typedef struct {
+	GLfloat x,y,z,w;
+} Vec4;
+
+typedef struct {
+	GLfloat x,y,z;
+} Vec3;
+
+typedef Vec4 Attractor[ATTRACTOR_COUNT]; /* xyz = Position, w = Mass */
+
+typedef float AttractorMass[ATTRACTOR_COUNT];
 
 #endif

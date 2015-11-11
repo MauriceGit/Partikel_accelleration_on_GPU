@@ -1,0 +1,112 @@
+#version 430 core
+
+// Uniform block containing positions and masses of the attractors
+/*layout (std140, binding = 0) uniform attractor_block
+{
+	vec4 attractor[64]; // xyz = position, w = mass
+};*/
+
+
+
+// Process particles in blocks of 128
+layout (local_size_x = 128, local_size_y = 1, local_size_z = 1) in;
+
+// Buffers containing the positions and velocities of the particles
+//layout (rgba32f, binding = 1) uniform imageBuffer velocity_buffer;
+//layout (rgba32f, binding = 0) uniform imageBuffer position_buffer;
+//layout (rgba32f, binding = 0) uniform imageBuffer position_buffer;
+layout (std430, binding = 0) buffer PositionBuffer {
+	vec4 positions[];
+};
+layout (std430, binding = 1) buffer VelocityBuffer {
+	vec4 velocities[];
+};
+layout (std430, binding = 2) buffer AttractorBuffer {
+	vec4 attractors[];
+};
+// Delta time
+uniform float dt;
+
+highp float rand(vec2 co)
+{
+    highp float a = 12.9898;
+    highp float b = 78.233;
+    highp float c = 43758.5453;
+    highp float dt= dot(co.xy ,vec2(a,b));
+    highp float sn= mod(dt,3.14);
+    return fract(sin(sn) * c);
+}
+
+float vecLen (vec3 v)
+{
+	return sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+}
+
+vec3 normalize (vec3 v)
+{
+	return v / vecLen(v);
+}
+
+vec3 calcForceFor (vec3 forcePoint, vec3 pos)
+{
+	// Force:
+	float gauss = 10000.0;
+	float e = 2.71828183;
+	float k_weak = 1.0;
+	vec3 dir = forcePoint - pos.xyz;
+	float g = pow (e, -pow(vecLen(dir), 2) / gauss);
+	vec3 f = normalize(dir) * k_weak * (1+ mod(rand(dir.xy), 10) - mod(rand(dir.yz), 10)) / 10.0 * g;
+	return f;
+}
+
+void main(void)
+{
+	uint index = gl_GlobalInvocationID.x;
+	//positions[index] = positions[index] + vec4(0.0001);
+	
+	int i;
+	float newDT = 0.0001;
+	newDT = dt * 1.0;
+	// Read the current position and velocity from the buffers
+	vec4 vel = velocities[index];
+	vec4 pos = positions[index];
+	
+	vec3 attractorConcrete = attractors[0].xyz;
+	float k_v = 1.5;
+	vec3 v = vec3(0);
+	vec3 f = vec3(0);
+	
+	// For each attractor;
+	for (i = 0; i < 32; i++) {
+		// Calculate force and update velocity accordingly
+		f += calcForceFor (attractors[i].xyz, pos.xyz);
+		//vel.xyz += newDT * newDT * attractors[i].w * normalize(dist) / (dot(dist, dist) + 10.0f);
+		//v += normalize(vel.xyz + (f * newDT)) * k_v;
+	}
+	
+	// Velocity:
+	//vec3 f = calcForceFor (attractors[0].xyz, pos.xyz);
+	v = normalize(vel.xyz + (f * newDT)) * k_v;
+	
+		
+	//vec3 v = vel.xyz + f * newDT;
+	
+	// Pos:
+	vec3 s = pos.xyz + v * newDT;
+	
+	pos.w -= 0.1f * newDT;
+	
+	// If the particle expires, reset it
+	if (pos.w <= 0) {
+		//pos.xyz  = -pos.xyz * 0.01f;
+		//pos.xyz  = vec3(rand(pos.xy), rand(pos.yz), rand(pos.xz));
+		pos.xyz = vec3(0);
+		vel.xyz *= 0.01f;
+		pos.w 	+= 1.0f;
+	}
+	
+	// Store the new position and velocity back into the buffers
+	positions[index] = vec4(s,pos.w);	
+	velocities[index] = vec4(v,vel.w);
+	
+}

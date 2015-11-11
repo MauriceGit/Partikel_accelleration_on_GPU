@@ -33,10 +33,17 @@
 /* Shader-ID's */
 GLuint G_ShaderColor, G_ComputeShader;
 
+/* Shader-Variablen */
+GLuint G_Velocity_buffer_loc, G_Position_buffer_loc;
+Attractor G_Attractor;
+AttractorMass G_Attractor_Mass;
+GLuint G_Position_buffer_tex, G_Velocity_buffer_tex;
+
 /* Geometrie-Buffer */
-GLuint G_ObjectsBuffer;
+GLuint G_ObjectsBuffer, G_Compute_Buffers, G_Position_buffer, G_Velocity_buffer, G_Attractor_buffer, G_AttractorMass_buffer, G_Life_buffer;
 
 GLuint G_Dispatch_buffer;
+
 static const struct
 {
 	GLuint num_groups_x;
@@ -44,11 +51,22 @@ static const struct
 	GLuint num_groups_z;
 } G_Dispatch_params = {16, 16, 1};
 
+Vec3 * G_ComputePositions;
+Vec4 * G_ComputeVelocities;
+Vec4 * G_ComputeAttractors;
+float * G_ComputeAttractorMass;
+float * G_ComputeLife;
+
 int G_Width = 1920;
 int G_Height = 1080;
-int G_FullScreen = 0;
+int G_FullScreen = 1;
 char* G_WindowTitle = "";
 GLFWwindow * G_Window = NULL;
+float G_Interval = 0;
+float G_ThisCallTime = 0;
+
+int G_FPS_Count = 0;
+double G_FPS_All = 0;
 
 
 GLfloat G_Objects[] = {
@@ -71,16 +89,23 @@ GLfloat G_Objects[] = {
  */
 double cbTimer (int lastCallTime)
 {
-	/* Seit dem Programmstart vergangene Zeit in Millisekunden */
-	int thisCallTime = glfwGetTime();
+	/* Seit dem Programmstart vergangene Zeit in Sekunden */
+	G_Interval = glfwGetTime();
+	glfwSetTime(0.0);
+	
+	G_FPS_Count++;
+	G_FPS_All += G_Interval;
+	
+	if (G_FPS_Count >= 1000) {
+		printf ("fps: %i\n", (int) (1.0 / ((double)G_FPS_All / (double)G_FPS_Count)));
+		G_FPS_All = 0.0;
+		G_FPS_Count = 0;
+	}
+	
+	/*printf ("dt: %f\n", G_Interval);*/
     
-	/* Seit dem letzten Funktionsaufruf vergangene Zeit in Sekunden */
-	double interval = (double) (thisCallTime - lastCallTime);
-		
-	calcTimeRelatedStuff(interval);
-			
-	return thisCallTime;
-    
+	calcTimeRelatedStuff(G_Interval);
+	return G_Interval;
 }
 
 /**
@@ -103,43 +128,9 @@ setProjection (GLdouble aspect)
       /* perspektivische Projektion */
       gluPerspective (90.0,     /* Oeffnungswinkel */
                       aspect,   /* Seitenverhaeltnis */
-                      0.01,      /* nahe ClipPIEng-Ebene */
-                      1000.0 /* ferne ClipPIEng-Ebene */ );
+                      0.5,      /* nahe ClipPIEng-Ebene */
+                      10000.0 /* ferne ClipPIEng-Ebene */ );
   }
-}
-
-static void drawColoredQuad(double r, double g, double b) {
-	glDisable(GL_CULL_FACE);
-	
-	glViewport (0, 0, G_Width, G_Height);		
-	setProjection ((double)G_Width/G_Height);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt (getCameraPosition(0), getCameraPosition(1), getCameraPosition(2),
-		 0.0, 0.0, 0.0,
-		 0.0, 1.0, 0.0);
-	
-	glUseProgram(G_ShaderColor);
-		GLfloat mp[16], mv[16];
-		glGetFloatv(GL_PROJECTION_MATRIX, mp);
-		glGetFloatv(GL_MODELVIEW_MATRIX, mv);
-		glUniformMatrix4fv(glGetUniformLocation(G_ShaderColor, "projMatrix"),  1, GL_FALSE, &mp[0]);
-		glUniformMatrix4fv(glGetUniformLocation(G_ShaderColor, "viewMatrix"),  1, GL_FALSE, &mv[0]);
-		
-		GLfloat color[] = {r, g, b};
-		GLfloat cam[] = {getCameraPosition(0), getCameraPosition(1), getCameraPosition(2)};
-		glUniform3fv(glGetUniformLocation(G_ShaderColor, "colorIn"), 1, color);
-		glUniform3fv(glGetUniformLocation(G_ShaderColor, "cameraPos"), 1, cam);
-		
-		glBindBuffer (GL_ARRAY_BUFFER, G_ObjectsBuffer);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		
-		glDisableVertexAttribArray(0);
-		glBindBuffer (GL_ARRAY_BUFFER, 0);
-	glUseProgram(0);
-	glEnable(GL_CULL_FACE);
 }
 
 /**
@@ -149,15 +140,78 @@ static void drawColoredQuad(double r, double g, double b) {
  */
 static void cbDisplay (GLFWwindow * window)
 {
+	int i;
+	int modValue = 3000;
+	double difValue = 10.0;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClearDepth(1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-	glUseProgram(G_ComputeShader);
 	
-	glDispatchCompute(16, 16, 1); 
-	drawColoredQuad(1.0, 0, 0);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+		
+	glDisable(GL_CULL_FACE);
+	
+	glViewport (0, 0, G_Width, G_Height);		
+	setProjection ((double)G_Width/G_Height);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt (getCameraPosition(0), getCameraPosition(1), getCameraPosition(2),
+		 0.0, 0.0, 0.0,
+		 0.0, 1.0, 0.0);
+		
+	G_ComputeAttractors = (Vec4*)glMapBufferRange(GL_ARRAY_BUFFER, 0, ATTRACTOR_COUNT*sizeof(Vec4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+	for (i = 0; i < ATTRACTOR_COUNT; i++) {
+		G_ComputeAttractors[i].x = sinf(G_FPS_All) * (rand()%500)/10.0;
+		G_ComputeAttractors[i].y = cosf(G_FPS_All) * (rand()%500)/10.0;
+		G_ComputeAttractors[i].z = tanf(G_FPS_All);
+	}
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	
+	glGenBuffers(1, &G_Attractor_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, G_Attractor_buffer);
+	glBufferData(GL_ARRAY_BUFFER, ATTRACTOR_COUNT * sizeof(Vec4), G_ComputeAttractors, GL_DYNAMIC_COPY);
+	
+	if (1) {	
+		glUseProgram(G_ComputeShader);
+			
+		/* Zeit-Interval-Geschichte */
+		glUniform1fv(glGetUniformLocation(G_ComputeShader, "dt"), 1, &G_Interval);			
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, G_Position_buffer);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, G_Velocity_buffer);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, G_Attractor_buffer);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, G_Life_buffer);
+			
+		glDispatchCompute(PARTICLE_COUNT / 128, 1, 1); 
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+		glUseProgram(0);
+	}
+	
+	glDeleteBuffers(1, &G_Attractor_buffer);
+	
+	glUseProgram(G_ShaderColor);
+	
+	GLfloat mp[16], mv[16];
+	glGetFloatv(GL_PROJECTION_MATRIX, mp);
+	glGetFloatv(GL_MODELVIEW_MATRIX, mv);
+	glUniformMatrix4fv(glGetUniformLocation(G_ShaderColor, "projMatrix"),  1, GL_FALSE, &mp[0]);
+	glUniformMatrix4fv(glGetUniformLocation(G_ShaderColor, "viewMatrix"),  1, GL_FALSE, &mv[0]);
+	
+	/* Vertex-Buffer zum Rendern der Positionen */
+	glBindBuffer (GL_ARRAY_BUFFER, G_Position_buffer);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4*sizeof(float), 0);
+	glBindBuffer (GL_ARRAY_BUFFER, G_Life_buffer);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0);
+	
+	glDrawArrays(GL_POINTS, 0, PARTICLE_COUNT);
+	
+	glEnable(GL_CULL_FACE);
+	glUseProgram(0);
+	
+	
 	
 	/* fuer DoubleBuffering */
 	glfwSwapBuffers(window);
@@ -176,7 +230,7 @@ int createWindow(void)
 	glfwDefaultWindowHints();
 	
 	if (G_FullScreen)
-		G_Window = glfwCreateWindow(1920, 1080, "   ", glfwGetPrimaryMonitor(), NULL);
+		G_Window = glfwCreateWindow(1920, 1080, G_WindowTitle, glfwGetPrimaryMonitor(), NULL);
 	else
 		G_Window = glfwCreateWindow(G_Width, G_Height, G_WindowTitle, NULL, NULL);
 	
@@ -518,6 +572,7 @@ int initAndStartIO (char *title, int width, int height)
 		/* Hintergrund und so werden initialisiert (Farben) */
 		if (initScene ())
 		{
+			int i;
 			printf ("--> Shader laden...\n"); fflush(stdout);
 			
 			G_ShaderColor = loadShaders("colorVertexShader.vert", "colorFragmentShader.frag");
@@ -531,15 +586,67 @@ int initAndStartIO (char *title, int width, int height)
 			glBindBuffer(GL_ARRAY_BUFFER, G_ObjectsBuffer); 
 			glBufferData(GL_ARRAY_BUFFER, sizeof(G_Objects), G_Objects, GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
+						
+			/* Physik-Simulation! ==================================================*/
 			
-			glGenBuffers(1, &G_Dispatch_buffer);
-			glBindBuffer(GL_DISPATCH_INDIRECT_BUFFER, G_Dispatch_buffer);
-			glBufferData(GL_DISPATCH_INDIRECT_BUFFER, sizeof(G_Dispatch_params), &G_Dispatch_params, GL_STATIC_DRAW);
+			/* Position */
+			G_ComputePositions = calloc(PARTICLE_COUNT, sizeof(Vec3));			
+			for (i = 0; i < PARTICLE_COUNT; i++) {
+				Vec3 vec;
+				vec.x = (rand() % 2000) / (500.0);
+				vec.y = (rand() % 2000) / (500.0);
+				vec.z = (rand() % 2000) / (500.0);
+				G_ComputePositions[i] = vec;
+			}
+			
+			glGenBuffers	(1, &G_Position_buffer);
+			glBindBuffer	(GL_ARRAY_BUFFER, G_Position_buffer);
+			glBufferData	(GL_ARRAY_BUFFER, PARTICLE_COUNT * sizeof(Vec3), G_ComputePositions, GL_DYNAMIC_COPY);
+			
+			/* Lebensdauer */
+			G_ComputeLife = calloc(PARTICLE_COUNT, sizeof(float));			
+			for (i = 0; i < PARTICLE_COUNT; i++) {
+				G_ComputeLife[i] = rand() / (double)RAND_MAX;
+			}
+			
+			glGenBuffers	(1, &G_Life_buffer);
+			glBindBuffer	(GL_ARRAY_BUFFER, G_Life_buffer);
+			glBufferData	(GL_ARRAY_BUFFER, PARTICLE_COUNT * sizeof(float), G_ComputeLife, GL_DYNAMIC_COPY);
+			
+			/* Geschwindigkeit */
+			G_ComputeVelocities = calloc(PARTICLE_COUNT, sizeof(Vec4));
+			for (i = 0; i < PARTICLE_COUNT; i++) {
+				Vec4 vec;
+				vec.x = (rand() % 100) / 500.0 - (rand() % 100) / 500.0;
+				vec.y = (rand() % 100) / 500.0 - (rand() % 100) / 500.0;
+				vec.z = (rand() % 100) / 500.0 - (rand() % 100) / 500.0;
+				vec.w =  0.0;
+				G_ComputeVelocities[i] = vec;
+			}
+			
+			glGenBuffers	(1, &G_Velocity_buffer);
+			glBindBuffer	(GL_ARRAY_BUFFER, G_Velocity_buffer);
+			glBufferData	(GL_ARRAY_BUFFER, PARTICLE_COUNT * sizeof(Vec4), G_ComputeVelocities, GL_DYNAMIC_COPY);
+			
+			/* Anziehungspunkte */
+			G_ComputeAttractors = calloc(ATTRACTOR_COUNT, sizeof(Vec4));
+			for (i = 0; i < ATTRACTOR_COUNT; i++) {
+				Vec4 vec;
+				vec.x = (rand() % 500) / 30.0 - (rand() % 500) / 30.0;
+				vec.y = (rand() % 500) / 30.0 - (rand() % 500) / 30.0;
+				vec.z = (rand() % 500) / 30.0 - (rand() % 500) / 30.0;
+				vec.w = G_Attractor_Mass[i];
+				G_ComputeAttractors[i] = vec;
+			}
+			glGenBuffers(1, &G_Attractor_buffer);
+			glBindBuffer(GL_ARRAY_BUFFER, G_Attractor_buffer);
+			glBufferData(GL_ARRAY_BUFFER, ATTRACTOR_COUNT * sizeof(Vec4), G_ComputeAttractors, GL_DYNAMIC_COPY);
 			
 			printf ("--> Initialisierung angeschlossen.\n"); fflush(stdout);
 			
 			/* Die Endlosschleife wird angestoßen */
 			mainLoop (G_Window);
+			
             
 		} else {
 			glfwDestroyWindow(G_Window);
@@ -548,6 +655,9 @@ int initAndStartIO (char *title, int width, int height)
 	} else {
 		return 0;
 	}
+	
+	glDeleteBuffers(1, &G_Position_buffer);
+	glDeleteBuffers(1, &G_Velocity_buffer);
 	
 	glfwDestroyWindow(G_Window);
 	

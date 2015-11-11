@@ -40,7 +40,7 @@ main (int argc, char **argv)
 	
 	glfwSetErrorCallback(error_callback);
 	
-	if (!initAndStartIO ("lots and lots of particles ... yeay ... :-)", 800, 800))
+	if (!initAndStartIO ("lots and lots of particles ... yeay ... :-)", 1920, 1080))
 	{
 		fprintf (stderr, "Initialisierung fehlgeschlagen!\n");
 		glfwTerminate();
