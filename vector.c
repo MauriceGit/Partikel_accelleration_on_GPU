@@ -2,7 +2,7 @@
  * @file
  * Hier ist die Datenhaltung und Programmlogik
  *
- * @author Tilman Nedele, Maurice Tollmien
+ * @author Maurice Tollmien
  */
 
 /* ---- System Header einbinden ---- */
