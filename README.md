@@ -4,7 +4,7 @@ This particle simulation is more like a proof of concept for myself or others to
 Using the knowledge I gathered from this project, more complex, fascinating and fast projects are possible, which use the power of 
 the GPU for computations which would normally be not possible in real time or a lot slower.
 
-And most important:
+*And most important:*
 
 With the compute-shader, I can simulate 8,000,000 independent particles in about 60fps on a GTX-660 (which is ok, but not really very good).
 
