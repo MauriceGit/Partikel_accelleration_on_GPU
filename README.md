@@ -1,7 +1,7 @@
 # Particle-Simulation using the GPU via the OpenGL Compute-Shader
 
 This particle simulation is more like a proof of concept for myself or others to show and understand how compute shaders in OpenGL work.
-Using the knowledge I gathered from this project, more complex, fascinating and fast projects are possible, which use the power of 
+Using the knowledge I gathered from this project, more complex, fascinating and fast projects are possible, which use the power of
 the GPU for computations which would normally be not possible in real time or a lot slower.
 
 **And most important:**
@@ -17,7 +17,7 @@ The final endresult looks like that:
 The physics of this animation are pretty straight forward. Each particle has a life-span in which it fades from red (new born) to blue (about dying).
 When a particle dies, it respawnes in its inverted (x,y,z) position.
 
-The movement itself is computed by calculating a Euler-integration for each particle. That means a force is calculated (dependant on the distance), 
+The movement itself is computed by calculating a Euler-integration for each particle. That means a force is calculated (dependant on the distance),
 then an acceleration, velocity and new position.
 
 There is a global attraction pole which moves just random! (Pure randomness).
@@ -45,7 +45,9 @@ The following system-attributes are required for running this simulation:
 
 - Also you need GLEW (I don't know, which library that was again...) and GLFW (Window-Manager)
 
-For installing GLFW you need to follow the following steps:
+You can get GLFW here. [http://www.glfw.org/](http://www.glfw.org/).
+
+And as far as I can see, you can get GLEW (with install instructions) here: [http://glew.sourceforge.net/build.html](http://glew.sourceforge.net/build.html).
 
 ### **Running**
 
