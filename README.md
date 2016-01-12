@@ -41,9 +41,9 @@ The following system-attributes are required for running this simulation:
 
 - A graphics card supporting OpenGL version 4.3 (For the compute-shader!).
 
-- Unix-Libraries: xorg-dev, freeglut3-dev and mesa-common-dev
+- Unix-Libraries: xorg-dev and mesa-common-dev
 
-- Also you need GLEW (I don't know, which library that was again...) and GLFW (Window-Manager)
+- Also you need GLEW (The OpenGL Extension Wrangler Library) and GLFW (Window-Manager).
 
 You can get GLFW here. [http://www.glfw.org/](http://www.glfw.org/).
 
@@ -63,15 +63,16 @@ While the simulation runs, you can move around (always looking to the center!) w
 
 So, here are some more screenshots, because screenshots are awesome :)
 
+![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_35.png "Particle-Simulation screenshot")
+![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_39.png "Particle-Simulation screenshot")
+![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_40.png "Particle-Simulation screenshot")
+![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_30.png "Particle-Simulation screenshot")
 ![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_0.png "Particle-Simulation screenshot")
 ![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_8.png "Particle-Simulation screenshot")
 ![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_10.png "Particle-Simulation screenshot")
 ![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_11.png "Particle-Simulation screenshot")
 ![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_22.png "Particle-Simulation screenshot")
-![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_35.png "Particle-Simulation screenshot")
-![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_39.png "Particle-Simulation screenshot")
-![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_40.png "Particle-Simulation screenshot")
-![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_30.png "Particle-Simulation screenshot")
+
 
 
 
