@@ -63,6 +63,8 @@ While the simulation runs, you can move around (always looking to the center!) w
 
 So, here are some more screenshots, because screenshots are awesome :)
 
+You can find some more screenshots in the screenshot-folder: [More Screenshots :)](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/tree/master/Screenshots).
+
 ![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_35.png "Particle-Simulation screenshot")
 ![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_39.png "Particle-Simulation screenshot")
 ![Particle-Simulation](https://github.com/MauriceGit/Partikel_accelleration_on_GPU/blob/master/Screenshots/screenshot_40.png "Particle-Simulation screenshot")
