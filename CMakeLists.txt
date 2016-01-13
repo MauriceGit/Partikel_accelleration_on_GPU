@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.2)
 
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
@@ -20,4 +20,4 @@ add_executable(particles src/imageLoader.c
 	src/vector.c
 	src/vector.h)
 
-target_link_libraries(particle ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${GLUT_LIBRARIES})
+target_link_libraries(particles ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${GLUT_LIBRARIES})
