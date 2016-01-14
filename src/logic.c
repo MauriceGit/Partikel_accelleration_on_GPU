@@ -13,11 +13,11 @@
 #include <math.h>
 #include <assert.h>
 
-#ifdef MACOSX
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
+//#ifdef MACOSX
+//#include <GLUT/glut.h>
+//#else
+//#include <GL/glut.h>
+//#endif
 
 /* ---- Eigene Header einbinden ---- */
 #include "logic.h"

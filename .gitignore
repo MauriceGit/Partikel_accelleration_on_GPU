@@ -1,2 +1,6 @@
 src/*.o
 src/particles
+.idea/
+bin/
+CMakeFiles/
+CMakeCache.txt
