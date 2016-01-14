@@ -43,19 +43,28 @@ The following system-attributes are required for running this simulation:
 
 - Unix-Libraries: xorg-dev and mesa-common-dev
 
-- Also you need GLEW (The OpenGL Extension Wrangler Library) and GLFW (Window-Manager).
+Both GLEW (The OpenGL Extension Wrangler Library) and GLFW (Window-Manager) are now included locally, so no system wide
+installation is necessary!
 
-You can get GLFW here. [http://www.glfw.org/](http://www.glfw.org/).
+Anyway, just for your interest, you could get them there:
 
-And as far as I can see, you can get GLEW (with install instructions) here: [http://glew.sourceforge.net/build.html](http://glew.sourceforge.net/build.html).
+- GLFW: [http://www.glfw.org/](http://www.glfw.org/).
+
+- GLEW (with install instructions): [http://glew.sourceforge.net/build.html](http://glew.sourceforge.net/build.html).
 
 ### **Running**
 
 Compiling and running is then pretty straight forward.
+It should also work in windows and OSX, but is not tested.
+In the root directory, do:
 
-- ./compile.sh
+- cmake .
 
-- ./particles
+- make
+
+- cd bin/
+
+- ./particleSim
 
 While the simulation runs, you can move around (always looking to the center!) with your mouse (left-klick and move) and zoom in/out with your mouse (right click and move up/down).
 
