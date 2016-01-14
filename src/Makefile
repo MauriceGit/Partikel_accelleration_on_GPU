@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -I.
 CFLAGS += $(shell pkg-config glfw3 --cflags)
-LDFLAGS = -L/usr/X11R6/lib64
+LDFLAGS = -L/opt/X11/lib/
 LIBS = -lz -lGLU -lGL -lGLEW
 LIBS += $(shell pkg-config glfw3 --static --libs)
 

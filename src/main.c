@@ -39,6 +39,7 @@ main (int argc, char **argv)
 	srand (time (0));
 	
 	glfwSetErrorCallback(error_callback);
+
 	
 	if (!initAndStartIO ("lots and lots of particles ... yeay ... :-)", 1920, 1080))
 	{

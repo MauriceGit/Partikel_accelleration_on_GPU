@@ -14,13 +14,13 @@
 #include <math.h>
 #include <string.h>
 
-#ifdef MACOSX
+#ifdef __APPLE__
 #include <GLUT/glut.h>
+#include <OpenGL/glu.h>
 #else
 #include <GL/glut.h>
-#endif
-
 #include <GL/glu.h>
+#endif
 
 /* ---- Eigene Header einbinden ---- */
 #include "scene.h"

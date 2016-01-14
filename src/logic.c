@@ -13,7 +13,7 @@
 #include <math.h>
 #include <assert.h>
 
-#ifdef MACOSX
+#ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
