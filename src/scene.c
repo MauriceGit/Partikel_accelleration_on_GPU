@@ -14,11 +14,11 @@
 #include <math.h>
 #include <string.h>
 
-#ifdef MACOSX
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
+//#ifdef MACOSX
+//#include <GLUT/glut.h>
+//#else
+//#include <GL/glut.h>
+//#endif
 
 #include <GL/glu.h>
 
