@@ -11,7 +11,6 @@ set(GLEW_SRC lib/glew-1.13.0/src/glew.c)
 file(COPY src/colorFragmentShader.frag DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 file(COPY src/colorVertexShader.vert DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 file(COPY src/particlesComputeShader.comp DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-file(COPY src/particlesComputeShader2.comp DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 add_executable(particleSim src/imageLoader.c
         src/imageLoader.h
