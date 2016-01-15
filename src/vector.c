@@ -5,6 +5,10 @@
  * @author Maurice Tollmien
  */
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 /* ---- System Header einbinden ---- */
 #include <stdio.h>
 #include <stddef.h>
@@ -21,11 +25,11 @@
  */
 void printVector (CGVector3D a)
 {
-	int i;
-	printf("\nprintVector:\n");
-	for (i=0;i<3;i++)
-		printf("%.1f\n", a[i]);
-	printf("\n");
+    int i;
+    printf("\nprintVector:\n");
+    for (i=0;i<3;i++)
+        printf("%.1f\n", a[i]);
+    printf("\n");
 }
 
 /**
@@ -84,11 +88,11 @@ void crossProduct3D(CGVector3D product, CGVector3D a, CGVector3D b)
  */
 double multiplyVectorVector (CGVector3D a, CGVector3D b)
 {
-	int i;
-	double res = 0.0;
-	for (i=0;i<3;i++)
-		res += a[i]*b[i];
-	return res;
+    int i;
+    double res = 0.0;
+    for (i=0;i<3;i++)
+        res += a[i]*b[i];
+    return res;
 }
 
 /**
@@ -96,14 +100,14 @@ double multiplyVectorVector (CGVector3D a, CGVector3D b)
  */
 void multiplyVectorScalar (CGVector3D a, double s, CGVector3D * res)
 {
-	int i;
-	for (i=0;i<3;i++)
-		(*res)[i] = a[i]*s;
+    int i;
+    for (i=0;i<3;i++)
+        (*res)[i] = a[i]*s;
 }
 
 double scalarProduct (CGVector3D a, CGVector3D b)
 {
-	return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];	
+    return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
 }
 
 /**
@@ -111,9 +115,9 @@ double scalarProduct (CGVector3D a, CGVector3D b)
  */
 void subtractVectorVector (CGVector3D a, CGVector3D b, CGVector3D * res)
 {
-	int i;
-	for (i=0;i<3;i++)
-		(*res)[i] = a[i] - b[i];
+    int i;
+    for (i=0;i<3;i++)
+        (*res)[i] = a[i] - b[i];
 }
 
 /**
@@ -121,9 +125,9 @@ void subtractVectorVector (CGVector3D a, CGVector3D b, CGVector3D * res)
  */
 void divideVectorScalar (CGVector3D a, double s, CGVector3D * res)
 {
-	int i;
-	for (i=0;i<3;i++)
-		(*res)[i] = a[i] / s;
+    int i;
+    for (i=0;i<3;i++)
+        (*res)[i] = a[i] / s;
 }
 
 /**
@@ -131,9 +135,9 @@ void divideVectorScalar (CGVector3D a, double s, CGVector3D * res)
  */
 void addVectorVector (CGVector3D a, CGVector3D b, CGVector3D * res)
 {
-	int i;
-	for (i=0;i<3;i++)
-		(*res)[i] = a[i] + b[i];
+    int i;
+    for (i=0;i<3;i++)
+        (*res)[i] = a[i] + b[i];
 }
 
 /**
@@ -142,7 +146,7 @@ void addVectorVector (CGVector3D a, CGVector3D b, CGVector3D * res)
  */
 double degToRad (double deg)
 {
-	return deg*PI/180.0;
+    return deg*PI/180.0;
 }
 
 /**
@@ -151,16 +155,16 @@ double degToRad (double deg)
  */
 double radToDeg (double rad)
 {
-	return rad*180.0/PI;
+    return rad*180.0/PI;
 }
 
 /**
- * Berechnet den Winkel zwischen zwei Vektoren und gibt das Ergebnis in 
+ * Berechnet den Winkel zwischen zwei Vektoren und gibt das Ergebnis in
  * ° zurück (nicht radiant!).
  */
 double angleVectorVector (CGVector3D a, CGVector3D b)
 {
-	return radToDeg (acos (multiplyVectorVector (a, b) / (vectorLength3D(a)*vectorLength3D(b))));
+    return radToDeg (acos (multiplyVectorVector (a, b) / (vectorLength3D(a)*vectorLength3D(b))));
 }
 
 
