@@ -36,7 +36,7 @@ GLuint G_ShaderColor, G_ComputeShader;
 /* Shader-Variablen */
 GLuint G_Velocity_buffer_loc, G_Position_buffer_loc;
 Attractor G_Attractor;
-AttractorMass G_Attractor_Mass;
+// AttractorMass G_Attractor_Mass;
 GLuint G_Position_buffer_tex, G_Velocity_buffer_tex;
 
 /* Geometrie-Buffer */
